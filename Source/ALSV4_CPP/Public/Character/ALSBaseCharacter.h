@@ -125,13 +125,13 @@ public:
 	EALSViewMode GetViewMode() const { return ViewMode; }
 
 	UFUNCTION(BlueprintCallable, Category = "ALS|Character States")
-	void SetOverlayState(EALSOverlayState NewState);
+	void SetOverlayState(uint8 NewState);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "ALS|Character States")
-	void Server_SetOverlayState(EALSOverlayState NewState);
+	void Server_SetOverlayState(uint8 NewState);
 
 	UFUNCTION(BlueprintGetter, Category = "ALS|Character States")
-	EALSOverlayState GetOverlayState() const { return OverlayState; }
+	uint8 GetOverlayState() const { return OverlayState; }
 
 	/** Landed, Jumped, Rolling, Mantling and Ragdoll*/
 	/** On Landed*/
@@ -349,7 +349,7 @@ protected:
 
 	virtual void OnViewModeChanged(EALSViewMode PreviousViewMode);
 
-	virtual void OnOverlayStateChanged(EALSOverlayState PreviousState);
+	virtual void OnOverlayStateChanged(uint8 PreviousState);
 
 	virtual void OnVisibleMeshChanged(const USkeletalMesh* PreviousSkeletalMesh);
 
@@ -427,7 +427,7 @@ protected:
 	void OnRep_ViewMode(EALSViewMode PrevViewMode);
 
 	UFUNCTION(Category = "ALS|Replication")
-	void OnRep_OverlayState(EALSOverlayState PrevOverlayState);
+	void OnRep_OverlayState(uint8 PrevOverlayState);
 
 	UFUNCTION(Category = "ALS|Replication")
 	void OnRep_VisibleMesh(USkeletalMesh* NewVisibleMesh);
@@ -483,7 +483,7 @@ protected:
 	/** State Values */
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ALS|State Values", ReplicatedUsing = OnRep_OverlayState)
-	EALSOverlayState OverlayState = EALSOverlayState::Default;
+	uint8 OverlayState = 0;
 
 	/** Movement System */
 

@@ -425,11 +425,11 @@ void AALSBaseCharacter::Server_SetViewMode_Implementation(EALSViewMode NewViewMo
 	SetViewMode(NewViewMode);
 }
 
-void AALSBaseCharacter::SetOverlayState(const EALSOverlayState NewState)
+void AALSBaseCharacter::SetOverlayState(const uint8 NewState)
 {
 	if (OverlayState != NewState)
 	{
-		const EALSOverlayState Prev = OverlayState;
+		const auto Prev = OverlayState;
 		OverlayState = NewState;
 		OnOverlayStateChanged(Prev);
 
@@ -441,7 +441,7 @@ void AALSBaseCharacter::SetOverlayState(const EALSOverlayState NewState)
 }
 
 
-void AALSBaseCharacter::Server_SetOverlayState_Implementation(EALSOverlayState NewState)
+void AALSBaseCharacter::Server_SetOverlayState_Implementation(uint8 NewState)
 {
 	SetOverlayState(NewState);
 }
@@ -939,7 +939,7 @@ void AALSBaseCharacter::OnViewModeChanged(const EALSViewMode PreviousViewMode)
 	}
 }
 
-void AALSBaseCharacter::OnOverlayStateChanged(const EALSOverlayState PreviousState)
+void AALSBaseCharacter::OnOverlayStateChanged(const uint8 PreviousState)
 {
 	MainAnimInstance->OverlayState = OverlayState;
 }
@@ -1549,7 +1549,7 @@ void AALSBaseCharacter::OnRep_ViewMode(EALSViewMode PrevViewMode)
 	OnViewModeChanged(PrevViewMode);
 }
 
-void AALSBaseCharacter::OnRep_OverlayState(EALSOverlayState PrevOverlayState)
+void AALSBaseCharacter::OnRep_OverlayState(uint8 PrevOverlayState)
 {
 	OnOverlayStateChanged(PrevOverlayState);
 }
