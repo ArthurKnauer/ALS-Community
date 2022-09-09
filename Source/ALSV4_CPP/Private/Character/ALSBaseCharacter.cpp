@@ -58,9 +58,9 @@ void AALSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("WalkAction", IE_Pressed, this, &AALSBaseCharacter::WalkPressedAction);
 	PlayerInputComponent->BindAction("RagdollAction", IE_Pressed, this, &AALSBaseCharacter::RagdollPressedAction);
 	PlayerInputComponent->BindAction("SelectRotationMode_1", IE_Pressed, this,
-	                                 &AALSBaseCharacter::VelocityDirectionPressedAction);
+		&AALSBaseCharacter::VelocityDirectionPressedAction);
 	PlayerInputComponent->BindAction("SelectRotationMode_2", IE_Pressed, this,
-	                                 &AALSBaseCharacter::LookingDirectionPressedAction);
+		&AALSBaseCharacter::LookingDirectionPressedAction);
 	PlayerInputComponent->BindAction("SprintAction", IE_Pressed, this, &AALSBaseCharacter::SprintPressedAction);
 	PlayerInputComponent->BindAction("SprintAction", IE_Released, this, &AALSBaseCharacter::SprintReleasedAction);
 	PlayerInputComponent->BindAction("AimAction", IE_Pressed, this, &AALSBaseCharacter::AimPressedAction);
@@ -168,8 +168,8 @@ void AALSBaseCharacter::PreInitializeComponents()
 	{
 		// Animation instance should be assigned if we're not in editor preview
 		checkf(GetWorld()->WorldType == EWorldType::EditorPreview,
-		       TEXT("%s doesn't have a valid animation instance assigned. That's not allowed"),
-		       *GetName());
+			TEXT("%s doesn't have a valid animation instance assigned. That's not allowed"),
+			*GetName());
 	}
 }
 
@@ -239,7 +239,7 @@ void AALSBaseCharacter::RagdollStart()
 
 	// Fixes character mesh is showing default A pose for a split-second just before ragdoll ends in listen server games
 	GetMesh()->bOnlyAllowAutonomousTickPose = true;
-	
+
 	SetReplicateMovement(false);
 }
 
@@ -272,7 +272,7 @@ void AALSBaseCharacter::RagdollEnd()
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		MainAnimInstance->Montage_Play(GetGetUpAnimation(bRagdollFaceUp),
-		                               1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+			1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
 	}
 	else
 	{
@@ -464,7 +464,7 @@ void AALSBaseCharacter::EventOnLanded()
 
 		// After 0.5 secs, reset braking friction factor to zero
 		GetWorldTimerManager().SetTimer(OnLandedFrictionResetTimer, this,
-		                                &AALSBaseCharacter::OnLandFrictionReset, 0.5f, false);
+			&AALSBaseCharacter::OnLandFrictionReset, 0.5f, false);
 	}
 }
 
@@ -706,8 +706,8 @@ void AALSBaseCharacter::GetCameraParameters(float& TPFOVOut, float& FPFOVOut, bo
 void AALSBaseCharacter::SetAcceleration(const FVector& NewAcceleration)
 {
 	Acceleration = (NewAcceleration != FVector::ZeroVector || IsLocallyControlled())
-		               ? NewAcceleration
-		               : Acceleration / 2;
+		? NewAcceleration
+		: Acceleration / 2;
 	MainAnimInstance->GetCharacterInformationMutable().Acceleration = Acceleration;
 }
 
@@ -716,12 +716,13 @@ void AALSBaseCharacter::RagdollUpdate(float DeltaTime)
 	// Set the Last Ragdoll Velocity.
 	const FVector NewRagdollVel = GetMesh()->GetPhysicsLinearVelocity(NAME_root);
 	LastRagdollVelocity = (NewRagdollVel != FVector::ZeroVector || IsLocallyControlled())
-		                      ? NewRagdollVel
-		                      : LastRagdollVelocity / 2;
+		? NewRagdollVel
+		: LastRagdollVelocity / 2;
 
 	// Use the Ragdoll Velocity to scale the ragdoll's joint strength for physical animation.
-	const float SpringValue = FMath::GetMappedRangeValueClamped({0.0f, 1000.0f}, {0.0f, 25000.0f},
-	                                                            LastRagdollVelocity.Size());
+	const UE::Math::TVector2<double> InputRange = { 0.0f, 1000.0f };
+	const UE::Math::TVector2<double> OutputRange = { 0.0f, 25000.0f };
+	const float SpringValue = FMath::GetMappedRangeValueClamped(InputRange, OutputRange, LastRagdollVelocity.Size());
 	GetMesh()->SetAllMotorsAngularDriveParams(SpringValue, 0.0f, 0.0f, false);
 
 	// Disable Gravity if falling faster than -4000 to prevent continual acceleration.
@@ -750,7 +751,8 @@ void AALSBaseCharacter::SetActorLocationDuringRagdoll(float DeltaTime)
 
 	if (bReversedPelvis) {
 		bRagdollFaceUp = PelvisRot.Roll > 0.0f;
-	} else
+	}
+	else
 	{
 		bRagdollFaceUp = PelvisRot.Roll < 0.0f;
 	}
@@ -761,7 +763,7 @@ void AALSBaseCharacter::SetActorLocationDuringRagdoll(float DeltaTime)
 	// Trace downward from the target location to offset the target location,
 	// preventing the lower half of the capsule from going through the floor when the ragdoll is laying on the ground.
 	const FVector TraceVect(TargetRagdollLocation.X, TargetRagdollLocation.Y,
-	                        TargetRagdollLocation.Z - GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+		TargetRagdollLocation.Z - GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 
 	UWorld* World = GetWorld();
 	check(World);
@@ -771,19 +773,19 @@ void AALSBaseCharacter::SetActorLocationDuringRagdoll(float DeltaTime)
 
 	FHitResult HitResult;
 	const bool bHit = World->LineTraceSingleByChannel(HitResult, TargetRagdollLocation, TraceVect,
-	                                                  ECC_Visibility, Params);
+		ECC_Visibility, Params);
 
 	if (ALSDebugComponent && ALSDebugComponent->GetShowTraces())
 	{
 		UALSDebugComponent::DrawDebugLineTraceSingle(World,
-		                                             TargetRagdollLocation,
-		                                             TraceVect,
-		                                             EDrawDebugTrace::Type::ForOneFrame,
-		                                             bHit,
-		                                             HitResult,
-		                                             FLinearColor::Red,
-		                                             FLinearColor::Green,
-		                                             1.0f);
+			TargetRagdollLocation,
+			TraceVect,
+			EDrawDebugTrace::Type::ForOneFrame,
+			bHit,
+			HitResult,
+			FLinearColor::Red,
+			FLinearColor::Green,
+			1.0f);
 	}
 
 	bRagdollOnGround = HitResult.IsValidBlockingHit();
@@ -1028,8 +1030,8 @@ void AALSBaseCharacter::SetEssentialValues(float DeltaTime)
 	else
 	{
 		EasedMaxAcceleration = GetCharacterMovement()->GetMaxAcceleration() != 0
-			                       ? GetCharacterMovement()->GetMaxAcceleration()
-			                       : EasedMaxAcceleration / 2;
+			? GetCharacterMovement()->GetMaxAcceleration()
+			: EasedMaxAcceleration / 2;
 	}
 
 	// Interp AimingRotation to current control rotation for smooth character rotation movement. Decrease InterpSpeed
@@ -1100,8 +1102,8 @@ void AALSBaseCharacter::UpdateGroundedRotation(float DeltaTime)
 			if (RotationMode == EALSRotationMode::VelocityDirection)
 			{
 				// Velocity Direction Rotation
-				SmoothCharacterRotation({0.0f, LastVelocityRotation.Yaw, 0.0f}, 800.0f, GroundedRotationRate,
-				                        DeltaTime);
+				SmoothCharacterRotation({ 0.0f, LastVelocityRotation.Yaw, 0.0f }, 800.0f, GroundedRotationRate,
+					DeltaTime);
 			}
 			else if (RotationMode == EALSRotationMode::LookingDirection)
 			{
@@ -1117,12 +1119,12 @@ void AALSBaseCharacter::UpdateGroundedRotation(float DeltaTime)
 					const float YawOffsetCurveVal = MainAnimInstance->GetCurveValue(NAME_YawOffset);
 					YawValue = AimingRotation.Yaw + YawOffsetCurveVal;
 				}
-				SmoothCharacterRotation({0.0f, YawValue, 0.0f}, 500.0f, GroundedRotationRate, DeltaTime);
+				SmoothCharacterRotation({ 0.0f, YawValue, 0.0f }, 500.0f, GroundedRotationRate, DeltaTime);
 			}
 			else if (RotationMode == EALSRotationMode::Aiming)
 			{
 				const float ControlYaw = AimingRotation.Yaw;
-				SmoothCharacterRotation({0.0f, ControlYaw, 0.0f}, 1000.0f, 20.0f, DeltaTime);
+				SmoothCharacterRotation({ 0.0f, ControlYaw, 0.0f }, 1000.0f, 20.0f, DeltaTime);
 			}
 		}
 		else
@@ -1151,7 +1153,7 @@ void AALSBaseCharacter::UpdateGroundedRotation(float DeltaTime)
 				}
 				else
 				{
-					AddActorWorldRotation({0, RotAmountCurve * (DeltaTime / (1.0f / 30.0f)), 0});
+					AddActorWorldRotation({ 0, RotAmountCurve * (DeltaTime / (1.0f / 30.0f)), 0 });
 				}
 				TargetRotation = GetActorRotation();
 			}
@@ -1162,7 +1164,7 @@ void AALSBaseCharacter::UpdateGroundedRotation(float DeltaTime)
 		// Rolling Rotation (Not allowed on networked games)
 		if (!bEnableNetworkOptimizations && bHasMovementInput)
 		{
-			SmoothCharacterRotation({0.0f, LastMovementInputRotation.Yaw, 0.0f}, 0.0f, 2.0f, DeltaTime);
+			SmoothCharacterRotation({ 0.0f, LastMovementInputRotation.Yaw, 0.0f }, 0.0f, 2.0f, DeltaTime);
 		}
 	}
 
@@ -1174,12 +1176,12 @@ void AALSBaseCharacter::UpdateInAirRotation(float DeltaTime)
 	if (RotationMode == EALSRotationMode::VelocityDirection || RotationMode == EALSRotationMode::LookingDirection)
 	{
 		// Velocity / Looking Direction Rotation
-		SmoothCharacterRotation({0.0f, InAirRotation.Yaw, 0.0f}, 0.0f, 5.0f, DeltaTime);
+		SmoothCharacterRotation({ 0.0f, InAirRotation.Yaw, 0.0f }, 0.0f, 5.0f, DeltaTime);
 	}
 	else if (RotationMode == EALSRotationMode::Aiming)
 	{
 		// Aiming Rotation
-		SmoothCharacterRotation({0.0f, AimingRotation.Yaw, 0.0f}, 0.0f, 15.0f, DeltaTime);
+		SmoothCharacterRotation({ 0.0f, AimingRotation.Yaw, 0.0f }, 0.0f, 15.0f, DeltaTime);
 		InAirRotation = GetActorRotation();
 	}
 }
@@ -1239,7 +1241,7 @@ EALSGait AALSBaseCharacter::GetActualGait(EALSGait AllowedGait) const
 }
 
 void AALSBaseCharacter::SmoothCharacterRotation(FRotator Target, float TargetInterpSpeed, float ActorInterpSpeed,
-                                                float DeltaTime)
+	float DeltaTime)
 {
 	// Interpolate the Target Rotation for extra smooth rotation behavior
 	TargetRotation =
@@ -1257,7 +1259,9 @@ float AALSBaseCharacter::CalculateGroundedRotationRate() const
 	const float MappedSpeedVal = MyCharacterMovementComponent->GetMappedSpeed();
 	const float CurveVal =
 		MyCharacterMovementComponent->CurrentMovementSettings.RotationRateCurve->GetFloatValue(MappedSpeedVal);
-	const float ClampedAimYawRate = FMath::GetMappedRangeValueClamped({0.0f, 300.0f}, {1.0f, 3.0f}, AimYawRate);
+	const UE::Math::TVector2<double> InputRange = { 0.0f, 300.0f };
+	const UE::Math::TVector2<double> OutputRange = { 1.0f, 3.0f };
+	const float ClampedAimYawRate = FMath::GetMappedRangeValueClamped(InputRange, OutputRange, AimYawRate);
 	return CurveVal * ClampedAimYawRate;
 }
 
@@ -1272,7 +1276,7 @@ void AALSBaseCharacter::LimitRotation(float AimYawMin, float AimYawMax, float In
 	{
 		const float ControlRotYaw = AimingRotation.Yaw;
 		const float TargetYaw = ControlRotYaw + (RangeVal > 0.0f ? AimYawMin : AimYawMax);
-		SmoothCharacterRotation({0.0f, TargetYaw, 0.0f}, 0.0f, InterpSpeed, DeltaTime);
+		SmoothCharacterRotation({ 0.0f, TargetYaw, 0.0f }, 0.0f, InterpSpeed, DeltaTime);
 	}
 }
 
@@ -1392,7 +1396,7 @@ void AALSBaseCharacter::CameraPressedAction()
 	check(World);
 	CameraActionPressedTime = World->GetTimeSeconds();
 	GetWorldTimerManager().SetTimer(OnCameraModeSwapTimer, this,
-	                                &AALSBaseCharacter::OnSwitchCameraMode, ViewModeSwitchHoldTime, false);
+		&AALSBaseCharacter::OnSwitchCameraMode, ViewModeSwitchHoldTime, false);
 }
 
 void AALSBaseCharacter::CameraReleasedAction()

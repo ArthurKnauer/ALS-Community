@@ -35,7 +35,7 @@ void AALSCharacter::ClearHeldObject()
 }
 
 void AALSCharacter::AttachToHand(UStaticMesh* NewStaticMesh, USkeletalMesh* NewSkeletalMesh, UClass* NewAnimClass,
-                                 bool bLeftHand, FVector Offset)
+                                 FName AttachBone, FVector Offset)
 {
 	ClearHeldObject();
 
@@ -50,16 +50,6 @@ void AALSCharacter::AttachToHand(UStaticMesh* NewStaticMesh, USkeletalMesh* NewS
 		{
 			SkeletalMesh->SetAnimInstanceClass(NewAnimClass);
 		}
-	}
-
-	FName AttachBone;
-	if (bLeftHand)
-	{
-		AttachBone = TEXT("VB LHS_ik_hand_gun");
-	}
-	else
-	{
-		AttachBone = TEXT("VB RHS_ik_hand_gun");
 	}
 
 	HeldObjectRoot->AttachToComponent(GetMesh(),
